@@ -2,6 +2,20 @@
 
 Generates Reddit-story style short videos (TTS via local Kokoro, subtitles via Whisper word timing, screenshots rendered with PIL) and optionally uploads them to YouTube / Google Drive.
 
+## What it does
+
+Pulls a real (or built-in demo) Reddit post, generates narration with local TTS, times word-level subtitles with Whisper, renders a vertical video with ffmpeg, and optionally uploads straight to YouTube.
+
+## Pipeline
+
+Reddit JSON API → Kokoro TTS → Whisper word timing → PIL/ffmpeg render → YouTube Data API
+
+Notable design choices:
+- **No paid TTS/API keys required** — narration runs locally via Kokoro, so the core pipeline works out of the box.
+- **Pipelined rendering** — TTS/Whisper for the next segment runs on a background thread while ffmpeg renders the current one on the GPU (VideoToolbox), cutting total render time.
+- **Reddit fetch with no API key** — uses Reddit's public `.json` endpoints directly rather than requiring OAuth app registration just to read posts.
+- **Virality scoring** — candidate posts are ranked by a weighted score (upvotes, comment engagement, awards, body length, keyword hits) before selecting one to render.
+
 ## Setup
 
 ```bash
